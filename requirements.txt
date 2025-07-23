@@ -1,0 +1,6 @@
+django
+djangorestframework
+django-nepali-datetime-field
+psycopg2-binary     # or  if you use PostgreSQL
+python-dotenv   # For environment variables (.env file)
+qrcode
