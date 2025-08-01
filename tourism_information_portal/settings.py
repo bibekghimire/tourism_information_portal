@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'userprofile','visitor_record',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,29 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'tourism_information_portal.urls'
 
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',  #enables the HTML browsable API
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+	    'PAGE_SIZE': 5,  # Default number of items per page
+	    'PAGE_SIZE_QUERY_PARAM': 'page_size',  # Allow clients to override page size
+	    'MAX_PAGE_SIZE': 100  # Cap the maximum page size
+}
+SIMPLE_JWT = {
+    # "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    # "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    # 'AUTH_HEADER_TYPES': ('Bearer',),
+
+    # "ROTATE_REFRESH_TOKENS": True,         #issue new refresh token every time
+    # "BLACKLIST_AFTER_ROTATION": True,      #blacklist old refresh tokens
+}
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
