@@ -2,7 +2,7 @@
 ## stores visitor's Informations:
 - first name
 - last name
-- Nationality
+- country
 - Address
 - contact no
 - emergency contact
@@ -10,6 +10,5 @@
 - Group
 ### Group
 - Group Name
-- Total Members
 
 ## Visitors can write review
