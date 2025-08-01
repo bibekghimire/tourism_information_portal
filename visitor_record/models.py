@@ -22,14 +22,14 @@ class BaseModel(models.Model):
         return self.created_by.full_name()
 
 class Group(BaseModel):
-    name=models.CharField("Group Name", max_length=100)
+    name=models.CharField("Group Name", max_length=100, unique=True)
 
 class Visitor(BaseModel):
     first_name=models.CharField(verbose_name="First Name", max_length=100)
     last_name=models.CharField(verbose_name="Last Name", max_length=100)
     country=models.CharField(verbose_name="Country", max_length=100)
     Address=models.CharField(verbose_name="Address", max_length=100, blank=True)
-    contact_number=models.CharField("Contact Number", max_length=100)
+    contact_number=models.CharField("Contact Number", max_length=20)
     email=models.EmailField(blank=True)
     emergency_contact=models.CharField("Emergency Contact", max_length=100)
     age=models.PositiveBigIntegerField("Age",validators=[MaxValueValidator(120)], blank=True)
@@ -38,6 +38,4 @@ class Visitor(BaseModel):
 class Review(models.Model):
     reviewer=models.ForeignKey(Visitor, verbose_name="Review ", on_delete=models.PROTECT, related_name='reviews')
     content=models.TextField("Review Content")
-
-
 
