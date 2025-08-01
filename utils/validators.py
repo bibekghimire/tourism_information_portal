@@ -196,3 +196,6 @@ def match_password(password1, password2):
     if not password2.strip():
         return False
     return password1==password2
+def password_validator(value):
+    from django.contrib.auth.password_validation import validate_password
+    return validate_password(value)
