@@ -11,10 +11,21 @@ from utils import choices as choices_
 #User Object Related Serializers
 class UserListSerializer(serializers.ModelSerializer):
     '''To list All the users, with username and id '''
+    url=serializers.SerializerMethodField()
     class Meta:
         model=User
-        fields=['username']
-        read_only_fields=['username','id']
+        fields=['username','id','url']
+        read_only_fields=['username','id','url']
+    def get_url(self,object):
+        request=self.context.get('request',None)
+        if request:
+            kwargs={'id':object.id}
+            return reverse(
+                'userprofile:user-retrieve-update-delete',
+                kwargs=kwargs,
+                request=request,
+            )
+
 
 class UserCreateSerializer(serializers.ModelSerializer):
     password1=serializers.CharField(max_length=32,write_only=True, validators=[validators.password_validator])
@@ -34,6 +45,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             password=validated_data['password1']
         )
+        user.save()
         return user
     
 class UserNameUpdateSerializer(serializers.ModelSerializer):
@@ -43,7 +55,7 @@ class UserNameUpdateSerializer(serializers.ModelSerializer):
         fields=['username']
     def update(self,instance,validated_data):
         username=validated_data['username']
-        if User.objects.exclude(instance.username).filter(username).exists():
+        if User.objects.exclude(id=instance.id).filter(username=username).exists():
             raise serializers.ValidationError(f'User with username: {username} already exists')
         setattr(instance,'username',validated_data['username'])
         instance.save()
@@ -61,6 +73,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
     def update(self,instance,validated_data):
         if instance.check_password(validated_data['old_password']):
             instance.set_password(validated_data['password1'])
+            instance.save()
         else:
             raise serializers.ValidationError("Old Password Incorrect")
     def create(self,validated_data):
@@ -79,6 +92,7 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
     def update(self,instance,validated_data):
         if isinstance(instance,User):
             instance.set_password(validated_data['password1'])
+            instance.save()
         else:
             raise serializers.ValidationError("Not a User Instance")
         return instance

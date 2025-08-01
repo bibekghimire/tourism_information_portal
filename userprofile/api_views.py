@@ -1,6 +1,6 @@
 from rest_framework.generics import GenericAPIView
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from . import serializers as serializers_
 from . import models
 from django.contrib.auth.models import User
@@ -32,9 +32,12 @@ class UserRetrieveUpdateDeleteView(
 ):
     permission_classes=[IsAuthenticated]
     def get_serializer_class(self):
-        if self.request.method=='post':
+        if self.request.method=='PATCH':
             return serializers_.UserNameUpdateSerializer
-    serializer_class=serializers_.UserListSerializer
+        elif self.request.method=='GET':
+            return serializers_.UserListSerializer
+        else:
+            return response("Method Not Allowed", status=status.HTTP_405_METHOD_NOT_ALLOWED)
     lookup_field='id'
     lookup_url_kwarg='id'
     queryset=User.objects.filter(is_superuser=False)
@@ -51,11 +54,13 @@ class ChangePasswordView(GenericAPIView, UpdateModelMixin):
     queryset=User.objects.all()
     lookup_url_kwarg='id'
     lookup_field='id'
+    def get_object(self):
+        return self.request.user
     def patch(self,request,*args,**kwargs):
         return self.partial_update(request,*args,**kwargs)
 
 class ResetPasswordView(GenericAPIView, UpdateModelMixin):
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated,IsAdminUser]
     serializer_class=serializers_.ResetPasswordSerializer
     queryset=User.objects.all()
     lookup_url_kwarg='id'
@@ -66,5 +71,3 @@ class ResetPasswordView(GenericAPIView, UpdateModelMixin):
         if request.user!=self.object:
             return self.patch(reqst,*args,**kwargs)
         return response("You Cannot Reset password yourself", status=status.HTTP_403_FORBIDDEN)
-
-     

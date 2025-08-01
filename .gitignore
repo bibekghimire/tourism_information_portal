@@ -54,3 +54,6 @@ coverage.xml
 *.egg-info/
 .eggs/
 *.docx
+# user Data
+user_*/
+user_*
