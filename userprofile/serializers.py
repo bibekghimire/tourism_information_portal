@@ -5,7 +5,10 @@ from rest_framework.reverse import reverse
 from django.contrib.auth.password_validation import validate_password
 from utils import validators
 from rest_framework.validators import ValidationError
+from utils import choices as choices_
 
+
+#User Object Related Serializers
 class UserListSerializer(serializers.ModelSerializer):
     '''To list All the users, with username and id '''
     class Meta:
@@ -14,17 +17,18 @@ class UserListSerializer(serializers.ModelSerializer):
         read_only_fields=['username','id']
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    password1=serializers.CharField(max_length=32, validators=[validators.password_validator])
-    password2=serializers.CharField(max_length=32)
-    username=serializers.CharField(validators=validators.username_validator)
+    password1=serializers.CharField(max_length=32,write_only=True, validators=[validators.password_validator])
+    password2=serializers.CharField(max_length=32,write_only=True,)
+    username=serializers.CharField(validators=[validators.username_validator])
     class Meta:
         model=User
         fields=['username','password1','password2']
     def validate(self,data):
         validators.match_password(data['password1'],data['password2'])
         username=data['username']
-        if User.objects.get(username=username):
+        if User.objects.filter(username=username).exists():
             raise ValidationError(f'User with username: {username} already exists')
+        return data
     def create(self,validated_data):
         user=User.objects.create_user(
             username=validated_data['username'],
@@ -33,7 +37,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return user
     
 class UserNameUpdateSerializer(serializers.ModelSerializer):
-    username=serializers.CharField(validators=validators.username_validator)
+    username=serializers.CharField(validators=[validators.username_validator])
     class Meta:
         model=User
         fields=['username']
@@ -44,9 +48,10 @@ class UserNameUpdateSerializer(serializers.ModelSerializer):
         setattr(instance,'username',validated_data['username'])
         instance.save()
         return instance
+
 class ChangePasswordSerializer(serializers.ModelSerializer):
     old_password=serializers.CharField(max_length=32, write_only=True)
-    password1=serializers.CharField(max_length=32,write_only=True validators=[validators.password_validator])
+    password1=serializers.CharField(max_length=32,write_only=True, validators=[validators.password_validator])
     password2=serializers.CharField(max_length=32, write_only=True)
     class Meta:
         model=User
@@ -60,9 +65,9 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Old Password Incorrect")
     def create(self,validated_data):
         raise serializers.ValidationError("Create Method not allowed on Change Password")
-    
+
 class ResetPasswordSerializer(serializers.ModelSerializer):
-    password1=serializers.CharField(max_length=32,write_only=True validators=[validators.password_validator])
+    password1=serializers.CharField(max_length=32,write_only=True, validators=[validators.password_validator])
     password2=serializers.CharField(max_length=32, write_only=True)
     class Meta:
         model=User
@@ -80,8 +85,7 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
     
 
 
-
-
+#UserProfileRelatedSerializers
 class ListUserProfileSerializer(serializers.ModelSerializer):
     url=serializers.SerializerMethodField()
     class Meta:
@@ -96,8 +100,10 @@ class ListUserProfileSerializer(serializers.ModelSerializer):
         )
 
 class CreateUserProfileSerializer(serializers.ModelSerializer):
+    choices=serializers.ChoiceField(choices_.RoleChoices)
     class Meta:
         model=UserProfile
         fields=['first_name','last_name','display_name','email','phone_number','date_of_birth','user','profile_picture','status']
+
 
 
