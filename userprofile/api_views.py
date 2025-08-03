@@ -71,3 +71,56 @@ class ResetPasswordView(GenericAPIView, UpdateModelMixin):
         if request.user!=self.object:
             return self.patch(reqst,*args,**kwargs)
         return response("You Cannot Reset password yourself", status=status.HTTP_403_FORBIDDEN)
+
+
+#User Profile View
+class UserProfileListCreateView(GenericAPIView, CreateModelMixin, ListModelMixin):
+    permission_classes=[IsAuthenticated]
+    def get_serializer_class(self):
+        if self.request.method=='POST':
+            return serializers_.CreateUserProfileSerializer
+        return serializers_.ListUserProfileSerializer
+    def get_queryset(self):
+        return models.UserProfile.all()
+    lookup_field='id'
+    lookup_url_kwarg='id'
+    def get(self,request,*args,**kwargs):
+        return self.list(request,*args,**kwargs)
+    def post(self,request,*args,**kwargs):
+        return self.create(request,*args,**kwargs)  
+    
+    
+class UserProfileDetailUpdateDeleteView(
+    GenericAPIView, RetrieveModelMixin, UpdateModelMixin
+):
+    permission_classes=[IsAuthenticated]
+    def get_serializer_class(self):
+        return serializers_.DetailUserProfileSerializer
+    def get_queryset(self):
+        return models.UserProfile.objects.all()
+    lookup_field='id'
+    lookup_url_kwarg='id'
+    def get(self,request,*args,**kwargs):
+        return self.retrieve(request,*args,**kwargs)
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request,*args,**kwargs)
+
+    
+class AdminDetailUserProfileView(
+    GenericAPIView, RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
+):
+    permission_classes=[IsAuthenticated]
+    serializer_class=serializers_.AdminDetailUserProfileSerializer
+    queryset=models.UserProfile.objects.all()
+    lookup_field='id'
+    lookup_url_kwarg='id'
+    def get(self,request,*args,**kwargs):
+        return self.retrieve(request, *args, **kwargs)
+    def patch(self,request,*args, **kwargs):
+        return self.partial_update(request,*args,**kwargs):
+    def put(self,request, *args,**kwargs):
+        return self.update(request, *args, **kwargs)
+    def delete(self,request, *args, **kwargs):
+        return self.destroy(request,*args,**kwargs)
+    
+
