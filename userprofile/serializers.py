@@ -26,7 +26,6 @@ class UserListSerializer(serializers.ModelSerializer):
                 request=request,
             )
 
-
 class UserCreateSerializer(serializers.ModelSerializer):
     password1=serializers.CharField(max_length=32,write_only=True, validators=[validators.password_validator])
     password2=serializers.CharField(max_length=32,write_only=True,)
@@ -104,7 +103,7 @@ class ListUserProfileSerializer(serializers.ModelSerializer):
     url=serializers.SerializerMethodField()
     class Meta:
         model=UserProfile
-        fields=['full_name', 'display name','phone_number', 'role','url']
+        fields=['full_name', 'display_name','phone_number', 'role','url']
     def get_url(self,obj):
         request=self.context.get['request', None]
         return reverse(
@@ -114,10 +113,45 @@ class ListUserProfileSerializer(serializers.ModelSerializer):
         )
 
 class CreateUserProfileSerializer(serializers.ModelSerializer):
-    choices=serializers.ChoiceField(choices_.RoleChoices)
+    # choices=serializers.ChoiceField(choices_.RoleChoices)
+    user=serializers.SlugRelatedField(queryset= User.objects.all(),slug_field='username' )
+
     class Meta:
         model=UserProfile
-        fields=['first_name','last_name','display_name','email','phone_number','date_of_birth','user','profile_picture','status']
+        fields=['first_name','last_name',
+                'display_name','email','phone_number',
+                'date_of_birth',
+                'user',
+                'profile_picture']
+    def validate_user(self, user):
+        if user.userprofile:
+            raise serializers.ValidationError(
+                f'This user: {user.username} already associated with profile: {user.userprofile.full_name}'
+            )
+        return user
+
+    def create(self,validated_data):
+        validated_data['created_by']=self.context.get('request').user
+        super().create(self,validated_data=validated_data)
+    def update(self,validated_data):
+        validated_data['modified_by']=self.context.get('request').user
+        super().create(self,validated_data=validated_data)
+
+class DetailUserProfileSerializer(serializers.ModelSerializer):
+    user=UserListSerializer()
+    class Meta:
+        model=UserProfile
+        fields=[
+            'first_name', 'last_name', 'display_name',
+            'email', 'phone_number', 'date_of_birth',
+            'user', 'profile_picture',
+            'created_at','last_modified',
+        ]   
+class AdminDetailUserProfileSerializer:
+    user=UserListSerializer()
+    class Meta:
+        model=UserProfile
+        fields='__all__'
 
 
 
