@@ -72,18 +72,18 @@ class UserProfile(CleanValidatedModel):
         validators=[validators.profile_picture_validator],
     )
     
-    role=models.CharField(
-        "User Roles",
-        null=True,
-        max_length=2,
-        choices=choices.RoleChoices.choices,
-    )
+    # role=models.CharField(
+    #     "User Roles",
+    #     null=True,
+    #     max_length=2,
+    #     choices=choices.RoleChoices.choices,
+    # )
     
-    status=models.CharField(
-        "Status",
-        null=True, max_length=3,
-        choices=choices.StatusChoices.choices,
-    )
+    # status=models.CharField(
+    #     "Status",
+    #     null=True, max_length=3,
+    #     choices=choices.StatusChoices.choices,
+    # )
     
     public_id=models.UUIDField("Public ID", default=uuid.uuid4, editable=False,unique=True)
 
