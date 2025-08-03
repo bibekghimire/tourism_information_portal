@@ -147,11 +147,14 @@ class DetailUserProfileSerializer(serializers.ModelSerializer):
             'user', 'profile_picture',
             'created_at','last_modified',
         ]   
+        read_only_fields=['created_at','last_modified','user']
+
 class AdminDetailUserProfileSerializer:
-    user=UserListSerializer()
+    user=serializers.SlugRelatedField(queryset= User.objects.all(),slug_field='username')
     class Meta:
         model=UserProfile
         fields='__all__'
+        read_only_fields=['created_by', 'created_at','last_modified','modified_by']
 
 
 
