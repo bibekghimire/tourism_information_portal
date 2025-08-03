@@ -10,6 +10,7 @@ def get_user_role(self):
         return self.userprofile.role
     return None
 User.add_to_class('role',property(get_user_role))
+
 def user_directory_path(instance, filename):
     ext=os.path.splitext(filename)[1] 
     return f'user_{instance.user.id}_{instance.first_name}/profile{ext}'
@@ -20,7 +21,7 @@ class UserExtension(models.Model):
     created_by=models.ForeignKey(User,null=True, on_delete=models.SET_NULL, related_name='created_users')
 
     def __str__(self):
-        return f"Extension of user: {self.user.usernmae}"
+        return f"Extension: {self.user.usernmae}"
 
 class CleanValidatedModel(models.Model):
     '''
@@ -29,6 +30,9 @@ class CleanValidatedModel(models.Model):
     '''
     _validated = False  # Internal flag for validated instances
     created_at=models.DateTimeField("Created At",auto_now_add=True)
+    created_by=models.ForeignKey(User, related_name='users_created', editable=False)
+    modified_by=models.ForeignKey(User,related_name='modified',null=True)
+    last_modified=models.DateTimeField("Last Modified",auto_now=True)
     class Meta:
         abstract=True
 
