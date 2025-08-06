@@ -21,7 +21,7 @@ class UserExtension(models.Model):
     created_by=models.ForeignKey(User,null=True, on_delete=models.SET_NULL, related_name='created_users')
 
     def __str__(self):
-        return f"Extension: {self.user.usernmae}"
+        return f"Extension: {self.user.username}"
 
 class CleanValidatedModel(models.Model):
     '''
@@ -30,8 +30,8 @@ class CleanValidatedModel(models.Model):
     '''
     _validated = False  # Internal flag for validated instances
     created_at=models.DateTimeField("Created At",auto_now_add=True)
-    created_by=models.ForeignKey(User, related_name='users_created', editable=False)
-    modified_by=models.ForeignKey(User,related_name='modified',null=True)
+    created_by=models.ForeignKey(User, related_name='userprofiles_created', editable=False, on_delete=models.PROTECT, null=True)
+    modified_by=models.ForeignKey(User,related_name='modified_profiles',null=True,on_delete=models.PROTECT, blank=True)
     last_modified=models.DateTimeField("Last Modified",auto_now=True)
     class Meta:
         abstract=True
@@ -44,11 +44,19 @@ class CleanValidatedModel(models.Model):
             super().save(*args, **kwargs)
 
 class UserProfile(CleanValidatedModel):
+    class Meta:
+        permissions=[
+            ('can_reset_creator_password', "Can Reset Creator Password"),
+            ('can_reset_staff_password','Can Reset Creator Password'),
+            ('can_update_creator_profile','Can Update Creator Profile'),
+            ('can_update_staff_profile','Can Update Staff Profile'),
+        ]
+    
     first_name=models.CharField(
         "First Name", max_length=32,
         validators=[validators.no_whitespace,validators.name_validator]
     )
-    
+
     last_name=models.CharField(
         "Last Name", max_length=32,
         validators=[validators.no_whitespace,validators.name_validator],
@@ -68,7 +76,7 @@ class UserProfile(CleanValidatedModel):
     
     date_of_birth=models.DateField("Date of Birth",validators=[validators.age_validator])
     
-    user=models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
+    user=models.OneToOneField(User, on_delete=models.PROTECT, related_name='userprofile')
     
     profile_picture=models.ImageField(
         "Profile Picture", blank=True,
@@ -76,18 +84,13 @@ class UserProfile(CleanValidatedModel):
         validators=[validators.profile_picture_validator],
     )
     
-    # role=models.CharField(
-    #     "User Roles",
-    #     null=True,
-    #     max_length=2,
-    #     choices=choices.RoleChoices.choices,
-    # )
+    role=models.CharField(
+        "User Role",
+        null=True,
+        max_length=2,
+        choices=choices.RoleChoices.choices,
+    )
     
-    # status=models.CharField(
-    #     "Status",
-    #     null=True, max_length=3,
-    #     choices=choices.StatusChoices.choices,
-    # )
     
     public_id=models.UUIDField("Public ID", default=uuid.uuid4, editable=False,unique=True)
 
@@ -105,6 +108,6 @@ class UserProfile(CleanValidatedModel):
                     os.remove(old.profile_picture.path)
         except UserProfile.DoesNotExist:
             pass
-        if not self.display_name.strip():
-            self.display_name=self.get_full_name()
+        if not self.display_name:
+            self.display_name=self.full_name
         super().save(*args,**kwargs)
