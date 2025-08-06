@@ -10,6 +10,7 @@ class BaseModel(models.Model):
     last_modified=models.DateTimeField("Last Updated", auto_now=True)
     created_by=models.ForeignKey(UserProfile, verbose_name="Created By", on_delete=models.PROTECT, related_name="%(class)s_added")
     _validated=False
+    last_modified_by=models.ForeignKey(UserProfile, on_delete=models.PROTECT, related_name="%(class)s_modified", blank=True, null=True)
     class Meta:
         abstract=True
         ordering=['last_modified']
