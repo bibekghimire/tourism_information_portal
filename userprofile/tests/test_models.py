@@ -51,7 +51,6 @@ def get_valid_profile_data():
     "phone_number": "9840172372",
     "date_of_birth": datetime.date(2000, 5, 3),
     "role": "AD",
-    "status": "ACT",
     }
 def get_invalid_data():
     return {
@@ -62,7 +61,6 @@ def get_invalid_data():
     "phone_number": ["0000000000","9666666666","984563217","xxxxxxxxxx"],
     "date_of_birth": ["1950/09/13",datetime.date(2015,5,3)],
     "role": ['CC',"AT"],
-    "status": ["PPP","FFF","ACT0"],
     }
 
 class TestUserProfile(TestCase):
