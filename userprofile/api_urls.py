@@ -7,6 +7,10 @@ urlpatterns=[
     path('',
          api_views.UserListCreateView.as_view(), 
          name='user-list-create'),
+    path('detail/',
+        api_views.SelfUserDetailView.as_view(), 
+        name='self-user-detail'
+    ),
     path('<int:id>/details/',
          api_views.UserRetrieveUpdateDeleteView.as_view(),
          name='user-retrieve-update-delete'),
@@ -27,9 +31,13 @@ urlpatterns=[
     ),
     path('userprofile/details/', 
         api_views.SelfUserProfileDetailUpdateView.as_view(), 
-        name='self-profile-update-delete'),
+        name='self-profile-detail-update'),
     path('admin/userprofile/<int:id>/details/',
          api_views.SuperUserProfileDetailUpdateDeleteView.as_view(),
          name='super-userprofile-detail-update-delete'),
-    path('role-choices/',api_views.GetRoleChoices.as_view(),name='get-role-choices')
+    path('role-choices/',api_views.GetRoleChoices.as_view(),name='get-role-choices'),
+    path(
+        'getusers/',
+        api_views.GetUsers.as_view(),name='get-users'
+    )
 ]
