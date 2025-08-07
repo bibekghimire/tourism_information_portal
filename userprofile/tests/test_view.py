@@ -11,10 +11,10 @@ class TestUserListCreateView(APITestCase):
         cls.admin_profile=UserProfileFactory(user=cls.admin, role='AD')
 
         cls.staff=UserFactory()
-        cls.staff_profile=UserProfileFactory(user=cls.staff, role='AD')
+        cls.staff_profile=UserProfileFactory(user=cls.staff, role='ST')
 
         cls.creator=UserFactory()
-        cls.creator_profile=UserProfileFactory(user=cls.creator, role='AD')
+        cls.creator_profile=UserProfileFactory(user=cls.creator, role='CR')
 
         cls.create_url = reverse('userprofile:user-list-create')
 
