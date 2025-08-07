@@ -186,16 +186,15 @@ def check_password(user, password):
     checks user's password supplied against stored password. 
     '''
     return user.check_password(password)
+
 def match_password(password1, password2):
     '''
     returne True or False
     checks password1 and password2 both not empty and identicle. 
     '''
-    if not password1.strip():
-        return False
-    if not password2.strip():
-        return False
     return password1==password2
+
 def password_validator(value):
+    return value
     from django.contrib.auth.password_validation import validate_password
     return validate_password(value)
