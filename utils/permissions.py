@@ -4,7 +4,7 @@ from rest_framework.permissions import SAFE_METHODS
 from utils import choices
 
 ADMIN=choices.RoleChoices.ADMIN
-STAFF=choices.RoleChoices.ADMIN
+STAFF=choices.RoleChoices.STAFF
 CREATOR=choices.RoleChoices.CREATOR
 
 # Helper Functions
