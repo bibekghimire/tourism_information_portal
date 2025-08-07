@@ -6,6 +6,7 @@ from django.contrib.auth.password_validation import validate_password
 from utils import validators
 from rest_framework.validators import ValidationError
 from utils import choices as choices_
+from utils import permissions as permissions_
 
 ADMIN=choices_.RoleChoices.ADMIN
 STAFF=choices_.RoleChoices.STAFF
@@ -13,6 +14,27 @@ CREATOR=choices_.RoleChoices.CREATOR
 
 
 #User Object Related Serializers
+class UserNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields=['username']
+class SelfUserDetailSerializer(serializers.ModelSerializer):
+    profile_url=serializers.SerializerMethodField()
+    class Meta:
+        model=User
+        fields=['username','role','profile_url']
+        read_only_fields=['username','url','profile_url']
+    def get_profile_url(self,object):
+        request=self.context.get('request',None)
+        userprofile=getattr(object,'userprofile',None)
+        if request:
+            if userprofile:
+                return reverse(
+                    'userprofile:self-profile-detail-update',
+                    request=request,
+                )
+        return None
+
 class UserListSerializer(serializers.ModelSerializer):
     '''To list All the users, with username and id '''
     url=serializers.SerializerMethodField()
@@ -33,14 +55,17 @@ class UserListSerializer(serializers.ModelSerializer):
     def get_profile_url(self,object):
         request=self.context.get('request',None)
         userprofile=getattr(object,'userprofile',None)
-        if request:
-            if userprofile:
-                kwargs={'id':userprofile.id}
-                return reverse(
-                    'userprofile:super-userprofile-detail-update-delete',
-                    kwargs=kwargs,
-                    request=request,
-                )
+        if userprofile:
+            kwargs={
+                'id':userprofile.id
+            }
+            if request:
+                if userprofile:
+                    return reverse(
+                        'userprofile:super-userprofile-detail-update-delete',
+                        request=request,
+                        kwargs=kwargs,
+                    )
         return None
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -152,6 +177,11 @@ class CreateUserProfileSerializer(serializers.ModelSerializer):
                 'user','role',
                 'profile_picture']
     def validate_user(self, user):
+        if self.context.get('request').user.role !=ADMIN or not self.context.get('request').user.is_superuser :
+            if user.extension.created_by != self.context.get('request').user:
+                raise serializers.ValidationError(
+                f'This user: {user.username} is not allowed to {self.context.get('request').user.username} to assign'
+            )
         if hasattr(user,'userprofile'):
             raise serializers.ValidationError(
                 f'This user: {user.username} already associated with profile: {user.userprofile.full_name}'
@@ -164,6 +194,8 @@ class CreateUserProfileSerializer(serializers.ModelSerializer):
         if user.role==ADMIN and assigned_role==ADMIN:
             raise serializers.ValidationError("Role Assignment Not allowed")
         elif user.role==STAFF and assigned_role in [ADMIN,STAFF]:
+            raise serializers.ValidationError(f"Role: {assigned_role} Assignment Not allowed to {user.role}")
+        elif user.role==CREATOR:
             raise serializers.ValidationError("Role Assignment Not allowed")
         else:
             validated_data['created_by']=user
@@ -175,7 +207,7 @@ class CreateUserProfileSerializer(serializers.ModelSerializer):
         raise serializers.ValidationError("Method Not Allowed")
 
 class SelfDetailUserProfileSerializer(serializers.ModelSerializer):
-    user=UserListSerializer()
+    user=SelfUserDetailSerializer()
     class Meta:
         model=UserProfile
         fields=[
