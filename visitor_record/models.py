@@ -24,6 +24,10 @@ class BaseModel(models.Model):
 
 class Group(BaseModel):
     name=models.CharField("Group Name", max_length=100, unique=True)
+    class Meta:
+        ordering=['created_at']
+        verbose_name="Travell Group"
+        verbose_name_plural="Travell Groups"
 
 class Visitor(BaseModel):
     route=models.ManyToManyField(Route,verbose_name="Travel route",related_name='visitors')
@@ -37,6 +41,9 @@ class Visitor(BaseModel):
     age=models.PositiveBigIntegerField("Age",validators=[MaxValueValidator(120)], blank=True)
     group=models.ForeignKey(Group, related_name='members', on_delete=models.PROTECT)
 
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
 class Review(models.Model):
     reviewer=models.ForeignKey(Visitor, verbose_name="Review ", on_delete=models.PROTECT, related_name='reviews')
     content=models.TextField("Review Content")
