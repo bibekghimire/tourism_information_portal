@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from userprofile.models import UserProfile
 from django.core.validators import MaxValueValidator
-
+from activity.models import Route
 # Create your models here.
 
 class BaseModel(models.Model):
@@ -26,6 +26,7 @@ class Group(BaseModel):
     name=models.CharField("Group Name", max_length=100, unique=True)
 
 class Visitor(BaseModel):
+    route=models.ManyToManyField(Route,verbose_name="Travel route",related_name='visitors')
     first_name=models.CharField(verbose_name="First Name", max_length=100)
     last_name=models.CharField(verbose_name="Last Name", max_length=100)
     country=models.CharField(verbose_name="Country", max_length=100)
