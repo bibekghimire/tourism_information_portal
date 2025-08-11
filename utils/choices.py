@@ -25,3 +25,9 @@ class StatusChoices(models.TextChoices):
     SUSPENDED= 'SUS', 'Suspended'
     DELETED= 'DEL', 'Deleted'
 
+class SeasonChoices(models.TextChoices):
+    SPRING = "spring", "Spring (Mar-May)"
+    SUMMER = "summer", "Summer (Jun-Aug)"
+    AUTUMN = "autumn", "Autumn (Sep-Nov)"
+    WINTER = "winter", "Winter (Dec-Feb)"
+    YEAR_ROUND = "year_round", "Year Round"
