@@ -18,6 +18,7 @@ class UserNameSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
         fields=['username']
+
 class SelfUserDetailSerializer(serializers.ModelSerializer):
     profile_url=serializers.SerializerMethodField()
     class Meta:
@@ -207,7 +208,7 @@ class CreateUserProfileSerializer(serializers.ModelSerializer):
         raise serializers.ValidationError("Method Not Allowed")
 
 class SelfDetailUserProfileSerializer(serializers.ModelSerializer):
-    user=SelfUserDetailSerializer()
+    user=SelfUserDetailSerializer() #change to UserNameSerialzier
     class Meta:
         model=UserProfile
         fields=[

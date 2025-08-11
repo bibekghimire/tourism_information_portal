@@ -18,7 +18,6 @@ class UserFactory(factory.django.DjangoModelFactory):
 class UserProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model=UserProfile
-
     user=factory.SubFactory(UserFactory)
     first_name=factory.LazyAttribute(lambda x: re.sub(r'[^a-zA-Z]', '', Faker().last_name())[:20])
     phone_number = factory.Sequence(lambda n: f"98{str(10000000 + n).zfill(8)}")
