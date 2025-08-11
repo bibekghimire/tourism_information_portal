@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/user/', include('userprofile.api_urls')),
+    path('api/visitor/', include('visitor_record.api_urls')),
     
     path('logout/', auth_views.LogoutView.as_view(next_page='api-auth/login/'), name='logout'),
     # path('logout/',LogoutView.as_view(), name='logout')
