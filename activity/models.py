@@ -2,9 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from utils import choices as choices_
 from userprofile.models import UserProfile
-# Create your models here.
+
 
 class BaseModel(models.Model):
+    '''provides fields commmon to all models
+    provides save method and other common methods
+    like Meta: ordering; author: returning full_name of creator
+    '''
     created_at=models.DateTimeField("Created At",auto_now_add=True)
     last_modified=models.DateTimeField("Last Updated", auto_now=True)
     created_by=models.ForeignKey(User, verbose_name="Created By", on_delete=models.PROTECT, related_name="%(class)s_added")
@@ -22,30 +26,50 @@ class BaseModel(models.Model):
         return self.created_by.full_name()
     
 class ActivityType(BaseModel):
-     title=models.CharField(max_length=10, help_text="Adventure and sports, Cultural")
+     '''
+     Activity type would be Adventure and sports, Cultural
+     "Academic and Research"
+     '''
+     title=models.CharField(max_length=100, help_text="Adventure and sports, Cultural", unique=True)
 
 class Activity(BaseModel):
-     title=models.CharField(max_length=50,help_text="Trekking, Camping, Hiking, recreation")
+     """
+     Activities would be based on ActivityType such as Trekking 
+     for Adventure and sports
+     recreation and spa for spiritural etc, can be changed on demand"""
+     title=models.CharField(max_length=50,unique=True)
      type=models.ForeignKey(ActivityType, on_delete=models.PROTECT, related_name='activities')
-     fetured_photo=models.ImageField(null=True)
+     fetured_photo=models.ImageField(null=True, blank=True)
      class Meta:
           ordering=['created_at']
 
 class Destination(BaseModel):
-    title=models.CharField(max_length=100)
+    """The Destinations would be any destiny, that is physical location
+    suppose: xyz_basecamp, xyz_view_point, xyz_model_farm
+    """
+    title=models.CharField(max_length=100, unique=True)
     activity=models.ManyToManyField(Activity, related_name='destinations')
-    geo_loaction=models.CharField(max_length=100) #switch to Lat and long
+    geo_location=models.CharField(max_length=100) #switch to Lat and long
     image1=models.ImageField(blank=True, null=True)
     image2=models.ImageField(blank=True, null=True)
     image3=models.ImageField(blank=True, null=True)
-    start_point = models.CharField(max_length=100)
-    end_point = models.CharField(max_length=100)
 
 class Route(BaseModel):
-     title=models.CharField(max_length=50)
+     """
+     These are specially for tracking purpose
+     it has start and end point
+     such as xyz_trekking route, xyz_research trip
+     in near future checkpoints too. 
+     """
+     title=models.CharField(max_length=50, unique=True)
      destinations=models.ManyToManyField(Destination, related_name='routes', null=True)
+     start_point = models.CharField(max_length=100)
+     end_point = models.CharField(max_length=100)
 
 class Travel(BaseModel):
+    """
+    This is for tourism destinations like
+    abc_trekking, avc_sports, abc_travell etc"""
     title=models.CharField("Activity Title",max_length=100,unique=True)
     activities=models.ForeignKey(Activity, related_name='travels', on_delete=models.SET_NULL, null=True)
     route=models.ManyToManyField(Route,null=True,verbose_name="Route",)
@@ -53,29 +77,17 @@ class Travel(BaseModel):
     image2=models.ImageField(blank=True, null=True)
     image3=models.ImageField(blank=True, null=True)
     descriptions=models.TextField("Descriptions")
-    duration=models.PositiveSmallIntegerField("Expected Duration")
+    duration=models.PositiveSmallIntegerField("Expected Duration in days")
     difficulty = models.CharField(
     choices=[('easy', 'Easy'), ('moderate', 'Moderate'), ('hard', 'Hard')],
     max_length=10
     )
     max_altitude_m = models.IntegerField(help_text="In meters")
     min_altitude_m = models.IntegerField(help_text="In meters", null=True, blank=True)
-    distance_km = models.FloatField(null=True, blank=True)  # optional
+    distance = models.FloatField(null=True, blank=True,help_text="In K.meters")  # optional
     best_season = models.CharField(
-    choices=[
-        ('spring', 'Spring (Mar-May)'),
-        ('summer', 'Summer (Jun-Aug)'),
-        ('autumn', 'Autumn (Sep-Nov)'),
-        ('winter', 'Winter (Dec-Feb)'),
-        ('year_round', 'Year Round')
-    ],
+    choices=choices_.SeasonChoices,
     max_length=20
-    )
-    activity_type=models.CharField(
-        choices=[
-             ('trekking',"Trekking"),
-
-        ]
     )
     required_permits = models.TextField(null=True, blank=True)  # or a separate Permit model
     is_guided_only = models.BooleanField(default=False)
