@@ -26,4 +26,4 @@ class TestGroup(TestCase):
             Group.objects.create(name="Group 1", created_by=self.user)
 
 class TestVisitor(TestCase):
-    
+    pass
