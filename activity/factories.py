@@ -11,24 +11,47 @@ def activity_title(n):
         'research','educational','vacation','picnic','festival',
     ]
     return titles[r] if r>0 else titles[random.randint(0,9)]
+class BaseFactory(factory.django.DjangoModelFactory):
+    created_by=factory.SubFactory(UserFactory)
 
-class ActivityTypeFactory(factory.django.DjangoModelFactory):
+class ActivityTypeFactory(BaseFactory):
     class Meta:
         model=ActivityType
     title=factory.Sequence(lambda n: f'activitytype{n}')
-    created_by=factory.SubFactory(UserFactory)
+    
 
-class ActivityFactory(factory.django.DjangoModelFactory):
+class ActivityFactory(BaseFactory):
     class Meta:
         model=Activity
     type=factory.SubFactory(ActivityTypeFactory)
     title=factory.Sequence(activity_title)
 
-class DestinationFactory(factory.django.DjangoModelFactory):
+class DestinationFactory(BaseFactory):
+    class Meta:
+        model=Destination
     title=factory.Sequence(lambda n: f'destination{n}')
-    activity=factory.SubFactory(ActivityFactory)
+    # activity=factory.SubFactory(ActivityFactory)
     geo_location='LAT LONG'
-    start_point=factory.Sequence(lambda n: f'start{n}')
-    end_point=factory.Sequence(lambda n: f'end{n}')
+    @factory.post_generation
+    def activity(self,create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            self.activity.set(extracted)
+        else:
+            self.activity.set(ActivityFactory.create_batch(2))
 
-class RouteFactory(factory.django.DjangoModelFactory):
+class RouteFactory(BaseFactory):
+    class Meta:
+        model=Route
+    title=factory.Sequence(lambda n: f'route{n}')
+    start_point=title=factory.Sequence(lambda n: f'start{n}')
+    end_point=title=factory.Sequence(lambda n: f'end{n}')
+    @factory.post_generation
+    def destinations(self,create,extracted,**kwargs):
+        if not create:
+            return 
+        if extracted:
+            self.destinations.set(extracted)
+        else:
+            self.destinations.set(DestinationFactory.create_batch(2))
