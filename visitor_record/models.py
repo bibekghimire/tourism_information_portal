@@ -8,9 +8,9 @@ from activity.models import Route
 class BaseModel(models.Model):
     created_at=models.DateTimeField("Created At",auto_now_add=True)
     last_modified=models.DateTimeField("Last Updated", auto_now=True)
-    created_by=models.ForeignKey(UserProfile, verbose_name="Created By", on_delete=models.PROTECT, related_name="%(class)s_added")
+    created_by=models.ForeignKey(User, verbose_name="Created By", on_delete=models.PROTECT, related_name="%(class)s_added")
     _validated=False
-    last_modified_by=models.ForeignKey(UserProfile, on_delete=models.PROTECT, related_name="%(class)s_modified", blank=True, null=True)
+    last_modified_by=models.ForeignKey(User, on_delete=models.PROTECT, related_name="%(class)s_modified", blank=True, null=True)
     class Meta:
         abstract=True
         ordering=['last_modified']
@@ -20,7 +20,11 @@ class BaseModel(models.Model):
         super().save(*args,**kwargs)
     @property
     def author(self):
-        return self.created_by.full_name()
+        userprofile=getattr(self.created_by,'userprofile',None)
+        if userprofile:
+            return self.created_by.userprofile.full_name
+        else:
+            return "Superuser"
 
 class Group(BaseModel):
     name=models.CharField("Group Name", max_length=100, unique=True)
@@ -34,13 +38,15 @@ class Visitor(BaseModel):
     first_name=models.CharField(verbose_name="First Name", max_length=100)
     last_name=models.CharField(verbose_name="Last Name", max_length=100)
     country=models.CharField(verbose_name="Country", max_length=100)
-    Address=models.CharField(verbose_name="Address", max_length=100, blank=True)
+    address=models.CharField(verbose_name="Address", max_length=100, blank=True)
     contact_number=models.CharField("Contact Number", max_length=20)
     email=models.EmailField(blank=True)
     emergency_contact=models.CharField("Emergency Contact", max_length=100)
     age=models.PositiveBigIntegerField("Age",validators=[MaxValueValidator(120)], blank=True)
     group=models.ForeignKey(Group, related_name='members', on_delete=models.PROTECT)
 
+    class Meta:
+        ordering=['created_at']
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
