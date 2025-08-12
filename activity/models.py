@@ -39,7 +39,7 @@ class Activity(BaseModel):
      recreation and spa for spiritural etc, can be changed on demand"""
      title=models.CharField(max_length=50,unique=True)
      type=models.ForeignKey(ActivityType, on_delete=models.PROTECT, related_name='activities')
-     fetured_photo=models.ImageField(null=True, blank=True)
+     featured_photo=models.ImageField(null=True, blank=True)
      class Meta:
           ordering=['created_at']
 
@@ -62,7 +62,7 @@ class Route(BaseModel):
      in near future checkpoints too. 
      """
      title=models.CharField(max_length=50, unique=True)
-     destinations=models.ManyToManyField(Destination, related_name='routes', null=True)
+     destinations=models.ManyToManyField(Destination, related_name='routes',)
      start_point = models.CharField(max_length=100)
      end_point = models.CharField(max_length=100)
 
@@ -72,7 +72,7 @@ class Travel(BaseModel):
     abc_trekking, avc_sports, abc_travell etc"""
     title=models.CharField("Activity Title",max_length=100,unique=True)
     activities=models.ForeignKey(Activity, related_name='travels', on_delete=models.SET_NULL, null=True)
-    route=models.ManyToManyField(Route,null=True,verbose_name="Route",)
+    route=models.ManyToManyField(Route,verbose_name="Route",)
     image1=models.ImageField(blank=True, null=True)
     image2=models.ImageField(blank=True, null=True)
     image3=models.ImageField(blank=True, null=True)
