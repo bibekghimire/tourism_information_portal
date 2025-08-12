@@ -5,6 +5,7 @@ import random
 from activity.models import ActivityType, Activity, Destination, Route
 
 def activity_title(n):
+    return f'activity {n}'
     r=n%10
     titles=[
         'Trekking', 'Camping', 'Hiking','cannonying','Zip Flyer',
