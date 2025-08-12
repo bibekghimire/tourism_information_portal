@@ -10,7 +10,7 @@ class BaseSerializer(serializers.ModelSerializer):
         validated_data['created_by']=self.context.get('request').user
         return super().create(validated_data)
     def update(self,instance,validated_data):
-        validated_data['last_modified_by']
+        validated_data['last_modified_by']=self.context.get('request').user
         return super().update(instance,validated_data)
 
 class ActivityTypeSerializer(BaseSerializer):
@@ -56,6 +56,14 @@ class DestinationListSerializer(serializers.ModelSerializer):
     class Meta:
         model=Destination
         fields=['title','url','id']
+    def get_url(self,obj):
+        request=self.context.get('request',None)
+        kwargs={'id':obj.id}
+        return reverse(
+            'activity:destination-detail-update-delete',
+            request=request,
+            kwargs=kwargs,
+        )
 
 class RouteCreateSerializer(BaseSerializer):
     destinations=serializers.SlugRelatedField(
@@ -74,11 +82,12 @@ class RouteListSerializer(serializers.ModelSerializer):
         fields=['title','url']
     def get_url(self,obj):
         request=self.context.get('request',None)
+        kwargs={'id':obj.id}
         if request:
             return reverse(
-                'view',
+                'activity:route-detail-update-delete',
                 request=request,
-                kwargs=''
+                kwargs=kwargs
             )
 
 class TravelCreateSerializer(BaseSerializer):
@@ -111,10 +120,10 @@ class TravelListSerializer(serializers.ModelSerializer):
         fields=['title','url']
     def get_ulr(self,obj):
         request=self.context.get('request')
-        kwargs={}
+        kwargs={'id':obj.id}
         if request:
             return reverse(
-                'view_name',
+                'activity:travel-detail-update-delete',
                 kwargs=kwargs,
                 request=request
             )
