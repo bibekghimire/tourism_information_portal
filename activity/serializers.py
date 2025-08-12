@@ -13,25 +13,26 @@ class BaseSerializer(serializers.ModelSerializer):
         validated_data['last_modified_by']
         return super().update(instance,validated_data)
 
-class CreateUpdateActivityTypeSerializer(BaseSerializer):
+class ActivityTypeSerializer(BaseSerializer):
     class Meta:
         model=ActivityType
-        fields=['title',]
+        fields=['title','id']
+        read_only_fields=['id']
 
-class ActivityTypeListSerializer(serializers.ModelSerializer):
-    url=serializers.SerializerMethodField()
-    class Meta:
-        model=ActivityType
-        fields=['title','url','id']
-    def get_url(self,obj):
-        raise("define url method")
-        request=self.context.get('request',None)
-        if request:
-            return reverse(
-                '',
-            )
+# class ActivityTypeListSerializer(serializers.ModelSerializer):
+#     url=serializers.SerializerMethodField()
+#     class Meta:
+#         model=ActivityType
+#         fields=['title','url','id']
+#     def get_url(self,obj):
+#         raise("define url method")
+#         request=self.context.get('request',None)
+#         if request:
+#             return reverse(
+#                 '',
+#             )
 
-class CreateActivitySerialzier(BaseSerializer):
+class ActivityCreateSerialzier(BaseSerializer):
     type=serializers.SlugRelatedField(queryset=ActivityType.objects.all(), slug_field='title')
     class Meta:
         model=Activity
@@ -43,12 +44,11 @@ class ActivityListSerializer(serializers.ModelSerializer):
         model=Activity
         fields=['title','url','id']
 
-class CreateDestinationSerialzier(BaseSerializer):
+class DestinationCreateSerialzier(BaseSerializer):
     class Meta:
         model=Destination
         fields=[
             'title','activity','geo_location','image1','image2','image3'
-            'start_point','end_point'
         ]
 
 class DestinationListSerializer(serializers.ModelSerializer):
@@ -57,7 +57,7 @@ class DestinationListSerializer(serializers.ModelSerializer):
         model=Destination
         fields=['title','url','id']
 
-class CreateRouteSerializer(BaseSerializer):
+class RouteCreateSerializer(BaseSerializer):
     destinations=serializers.SlugRelatedField(
         many=True,
         queryset=Destination.objects.all(),
