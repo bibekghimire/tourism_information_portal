@@ -19,19 +19,6 @@ class ActivityTypeSerializer(BaseSerializer):
         fields=['title','id']
         read_only_fields=['id']
 
-# class ActivityTypeListSerializer(serializers.ModelSerializer):
-#     url=serializers.SerializerMethodField()
-#     class Meta:
-#         model=ActivityType
-#         fields=['title','url','id']
-#     def get_url(self,obj):
-#         raise("define url method")
-#         request=self.context.get('request',None)
-#         if request:
-#             return reverse(
-#                 '',
-#             )
-
 class ActivityCreateSerialzier(BaseSerializer):
     type=serializers.SlugRelatedField(queryset=ActivityType.objects.all(), slug_field='title')
     class Meta:
@@ -39,12 +26,25 @@ class ActivityCreateSerialzier(BaseSerializer):
         fields=['title','type','featured_photo']
 
 class ActivityListSerializer(serializers.ModelSerializer):
-    url=serializers.SerializerMethodField
+    url=serializers.SerializerMethodField()
     class Meta:
         model=Activity
         fields=['title','url','id']
+    def get_url(self,obj):
+        request=self.context.get('request',None)
+        kwargs={'id':obj.id}
+        return reverse(
+            'activity:activity-detail-update-delete',
+            request=request,
+            kwargs=kwargs,
+        )
 
-class DestinationCreateSerialzier(BaseSerializer):
+class DestinationCreateSerializer(BaseSerializer):
+    activity=serializers.SlugRelatedField(
+        many=True,
+        queryset=Activity.objects.all(),
+        slug_field='title'
+    )
     class Meta:
         model=Destination
         fields=[
