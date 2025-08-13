@@ -82,7 +82,7 @@ class DestinationListCreateView(GenericAPIView,ListModelMixin, CreateModelMixin)
     def get_serializer_class(self):
         if self.request.method=='GET':
             return serializers_.DestinationListSerializer
-        return serializers_.DestinationCreateSerialzier
+        return serializers_.DestinationCreateSerializer
     def get(self,request,*args,**kwargs):
         return self.list(request,*args,**kwargs)
     def post(self, request,*args,**kwargs):
@@ -92,7 +92,7 @@ class DestinationDetailUpdateDeleteView(
     GenericAPIView, RetrieveModelMixin,
     UpdateModelMixin, DestroyModelMixin
 ):
-    serializer_class=serializers_.DestinationCreateSerialzier
+    serializer_class=serializers_.DestinationCreateSerializer
     lookup_field='id'
     lookup_url_kwarg='id'
     queryset=models.Destination.objects.all()
