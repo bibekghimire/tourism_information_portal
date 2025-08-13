@@ -53,6 +53,8 @@ class Destination(BaseModel):
     image1=models.ImageField(blank=True, null=True)
     image2=models.ImageField(blank=True, null=True)
     image3=models.ImageField(blank=True, null=True)
+    class Meta:
+        ordering=['created_at']
 
 class Route(BaseModel):
      """
