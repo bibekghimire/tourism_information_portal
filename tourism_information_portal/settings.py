@@ -103,6 +103,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'TEST': {
+            'NAME': BASE_DIR / 'test_db.sqlite3',  # <-- Django will create this for tests
+        }
+    },
+    'test': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'test_db.sqlite3',                      # in-memory DB, fast & isolated
+        # OR use a temporary file if you want persistence
+        # 'NAME': BASE_DIR / 'test_db.sqlite3',
     }
 }
 
