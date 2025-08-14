@@ -96,19 +96,24 @@ class TravelCreateSerializer(BaseSerializer):
         slug_field='title',
         many=True,
     )
-    route=serializers.SlugRelatedField(
+    routes=serializers.SlugRelatedField(
         queryset=Route.objects.all(),
+        slug_field='title',
+        many=True
+    )
+    destinations=serializers.SlugRelatedField(
+        queryset=Destination.objects.all(),
         slug_field='title',
         many=True
     )
     class Meta:
         model=Travel
         fields=[
-            'title','activities','route',
+            'title','activities','routes','destinations',
             'image1','image2','image3',
             'descriptions','duration',
             'difficulty',
-            'max_altitude_m','min_altitude_m',
+            'max_altitude','min_altitude',
             'distance','best_season',
             'required_permits','is_guided_only',
         ]
@@ -118,7 +123,7 @@ class TravelListSerializer(serializers.ModelSerializer):
     class Meta:
         model=Travel
         fields=['title','url']
-    def get_ulr(self,obj):
+    def get_url(self,obj):
         request=self.context.get('request')
         kwargs={'id':obj.id}
         if request:
