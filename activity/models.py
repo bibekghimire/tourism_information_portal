@@ -72,9 +72,10 @@ class Travel(BaseModel):
     """
     This is for tourism destinations like
     abc_trekking, avc_sports, abc_travell etc"""
-    title=models.CharField("Activity Title",max_length=100,unique=True)
-    activities=models.ForeignKey(Activity, related_name='travels', on_delete=models.SET_NULL, null=True)
-    route=models.ManyToManyField(Route,verbose_name="Route",)
+    title=models.CharField("Travel Title",max_length=100,unique=True)
+    activities=models.ManyToManyField(Activity, related_name='travels')
+    routes=models.ManyToManyField(Route,verbose_name="Route",related_name='travels')
+    destinations=models.ManyToManyField(Destination,related_name='travels')
     image1=models.ImageField(blank=True, null=True)
     image2=models.ImageField(blank=True, null=True)
     image3=models.ImageField(blank=True, null=True)
@@ -84,8 +85,8 @@ class Travel(BaseModel):
     choices=[('easy', 'Easy'), ('moderate', 'Moderate'), ('hard', 'Hard')],
     max_length=10
     )
-    max_altitude_m = models.IntegerField(help_text="In meters")
-    min_altitude_m = models.IntegerField(help_text="In meters", null=True, blank=True)
+    max_altitude= models.IntegerField(help_text="In meters")
+    min_altitude= models.IntegerField(help_text="In meters", null=True, blank=True)
     distance = models.FloatField(null=True, blank=True,help_text="In K.meters")  # optional
     best_season = models.CharField(
     choices=choices_.SeasonChoices,
