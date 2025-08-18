@@ -1,6 +1,8 @@
 from django.urls import path
 from . import api_views
 
+'''
+/api/activity/'''
 app_name='activity'
 urlpatterns=[
     path('type/',api_views.ActivityTypeListCreateView.as_view(),
