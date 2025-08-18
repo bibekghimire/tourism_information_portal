@@ -6,6 +6,7 @@ from rest_framework import status
 from utils import choices as choices_
 from . import serializers as serializers_
 from . import models
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from rest_framework.mixins import (
     CreateModelMixin, ListModelMixin, 
@@ -20,7 +21,7 @@ def get_season_choices(request):
     return response.Response(season_choices, status=status.HTTP_200_OK)
 
 class ActivityTypeListCreateView(GenericAPIView, ListModelMixin, CreateModelMixin):
-    permission_classes=[]
+    permission_classes=[IsAuthenticatedOrReadOnly]
     serializer_class=serializers_.ActivityTypeSerializer
     queryset=models.ActivityType.objects.all()
 
@@ -33,7 +34,7 @@ class ActivityTypeDetailUpdateDeleteView(
     GenericAPIView, RetrieveModelMixin,
     UpdateModelMixin, DestroyModelMixin
 ):
-    permission_classes=[]
+    permission_classes=[IsAuthenticatedOrReadOnly]
     serializer_class=serializers_.ActivityTypeSerializer
     queryset=models.ActivityType.objects.all()
     lookup_field='id'
@@ -49,7 +50,7 @@ class ActivityTypeDetailUpdateDeleteView(
         return self.destroy(request,*args,**kwargs)
 
 class ActivityListCreateView(GenericAPIView, ListModelMixin, CreateModelMixin):
-    permission_classes=[]
+    permission_classes=[IsAuthenticatedOrReadOnly]
     def get_serializer_class(self):
         if self.request.method=='GET':
             return serializers_.ActivityListSerializer
@@ -64,6 +65,7 @@ class ActivityDetailUpdateDeleteView(
     GenericAPIView, RetrieveModelMixin, 
     UpdateModelMixin, DestroyModelMixin
 ):
+    permission_classes=[IsAuthenticatedOrReadOnly]
     serializer_class=serializers_.ActivityCreateSerialzier
     lookup_field='id'
     lookup_url_kwarg='id'
@@ -77,7 +79,7 @@ class ActivityDetailUpdateDeleteView(
         return self.destroy(request,*args,**kwargs)
 
 class DestinationListCreateView(GenericAPIView,ListModelMixin, CreateModelMixin):
-    permission_classes=[]
+    permission_classes=[IsAuthenticatedOrReadOnly]
     queryset=models.Destination.objects.all()
     def get_serializer_class(self):
         if self.request.method=='GET':
@@ -92,6 +94,7 @@ class DestinationDetailUpdateDeleteView(
     GenericAPIView, RetrieveModelMixin,
     UpdateModelMixin, DestroyModelMixin
 ):
+    permission_classes=[IsAuthenticatedOrReadOnly]
     serializer_class=serializers_.DestinationCreateSerializer
     lookup_field='id'
     lookup_url_kwarg='id'
@@ -107,6 +110,7 @@ class DestinationDetailUpdateDeleteView(
         return self.destroy(request,*args,**kwargs)
     
 class RouteListCreateView(GenericAPIView, ListModelMixin, CreateModelMixin):
+    permission_classes=[IsAuthenticatedOrReadOnly]
     def get_serializer_class(self):
         if self.request.method=='GET':
             return serializers_.RouteListSerializer
@@ -121,7 +125,7 @@ class RouteDetailUpdateDeleteView(
     GenericAPIView, RetrieveModelMixin,
     UpdateModelMixin, DestroyModelMixin
 ):
-    permission_classes=[]
+    permission_classes=[IsAuthenticatedOrReadOnly]
     serializer_class=serializers_.RouteCreateSerializer
     queryset=models.Route.objects.all()
     lookup_field='id'
@@ -137,7 +141,7 @@ class RouteDetailUpdateDeleteView(
         return self.destroy(request,*args,**kwargs)
 
 class TravelListCreateView(GenericAPIView, ListModelMixin, CreateModelMixin):
-    permission_classes=[]
+    permission_classes=[IsAuthenticatedOrReadOnly]
     def get_serializer_class(self):
         if self.request.method=='GET':
             return serializers_.TravelListSerializer
@@ -153,7 +157,7 @@ class TravelDetailUpdateDeleteView(
     GenericAPIView, RetrieveModelMixin,
     UpdateModelMixin, DestroyModelMixin
 ):
-    permission_classes=[]
+    permission_classes=[IsAuthenticatedOrReadOnly]
     serializer_class=serializers_.TravelCreateSerializer
     queryset=models.Travel.objects.all()
     lookup_field='id'
