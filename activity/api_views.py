@@ -17,6 +17,8 @@ from rest_framework.mixins import (
 @api_view(['GET'])
 @login_required
 def get_season_choices(request):
+    '''
+    returns choices for seasons, like: summer, spring, winter, autumn'''
     season_choices=[{"key": item.value, "label": item.label} for item in choices_.SeasonChoices]
     return response.Response(season_choices, status=status.HTTP_200_OK)
 

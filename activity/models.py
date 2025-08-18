@@ -61,7 +61,6 @@ class Route(BaseModel):
      These are specially for tracking purpose
      it has start and end point
      such as xyz_trekking route, xyz_research trip
-     in near future checkpoints too. 
      """
      title=models.CharField(max_length=50, unique=True)
      destinations=models.ManyToManyField(Destination, related_name='routes',)
